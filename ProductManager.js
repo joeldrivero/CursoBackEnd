@@ -1,4 +1,5 @@
 const fs = require('fs');
+let contador = 0;
 
 class ProductManager {
     constructor(productos = [], path) {
@@ -9,14 +10,32 @@ class ProductManager {
     static id = 0;
 
     addProducts = (productoNuevo) => {
+        let save = {};
         if (!productoNuevo.title || !productoNuevo.description || !productoNuevo.price || !productoNuevo.thumbnail || !productoNuevo.code || !productoNuevo.stock) {
             return console.error("Por favor, complete todos los campos obligatorios");
         }
 
-        if (this.productos.find(prod => prod.code === productoNuevo.code)) return console.error("El producto ya existe");
-        this.productos.push({ title: productoNuevo.title, description: productoNuevo.description, price: productoNuevo.price, thumbnail: productoNuevo.thumbnail, code: productoNuevo.code, stock: productoNuevo.stock, id: ProductManager.id })
-        fs.writeFileSync(this.path, JSON.stringify(this.productos));
-        ProductManager.id++;
+
+        if (!fs.existsSync(this.path)) {
+            productoNuevo.id = contador;
+            save = JSON.stringify(productoNuevo)
+        }
+        else {
+            const prod = this.getProducts();
+
+            if (prod.length > 0) {
+                if (prod.find(prod => prod.code === productoNuevo.code)) return console.error("El producto ya existe");
+                contador = prod.length - 1;
+                productoNuevo.id = contador;
+                save = JSON.stringify([...prod, productoNuevo])
+            }
+            else {
+          
+                productoNuevo.id = 0;
+                save = JSON.stringify([productoNuevo])
+            }
+        }
+        fs.writeFileSync(this.path, save);
     }
 
     getProducts() {
@@ -70,8 +89,15 @@ class ProductManager {
         const prod = prodArchivo.filter(prod => prod.id != id)
         prod ? fs.writeFileSync(this.path, JSON.stringify(prod)) : console.log("Not Found");
     };
-
-
 }
 
 const productos = new ProductManager([], "./productos.json");
+
+productos.addProducts({
+    title: "“producto prueba”",
+    description: "”Este es un producto prueba”",
+    price: 200,
+    thumbnail: "”Sin imagen”",
+    code: "”abc123”",
+    stock: 25
+})
