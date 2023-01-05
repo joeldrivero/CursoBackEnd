@@ -18,19 +18,18 @@ class ProductManager {
 
         if (!fs.existsSync(this.path)) {
             productoNuevo.id = contador;
-            save = JSON.stringify(productoNuevo)
+            save = JSON.stringify([productoNuevo])
         }
         else {
             const prod = this.getProducts();
 
             if (prod.length > 0) {
                 if (prod.find(prod => prod.code === productoNuevo.code)) return console.error("El producto ya existe");
-                contador = prod.length - 1;
+                contador = prod.length;
                 productoNuevo.id = contador;
                 save = JSON.stringify([...prod, productoNuevo])
             }
             else {
-          
                 productoNuevo.id = 0;
                 save = JSON.stringify([productoNuevo])
             }
@@ -52,33 +51,35 @@ class ProductManager {
     updateProduct(producto, id) {
 
         const prodArchivo = this.getProducts();
-        const prod = prodArchivo.find(prod => prod.id === id)
-        console.log(producto.title)
-        console.log(this.productos)
+        const prodIndex = prodArchivo.findIndex(prod => prod.id === id)
+        console.log(prodIndex)
 
-        if (producto.title && prod.title != producto.title) {
-            prod.title = producto.title;
+
+        if (prodIndex === -1)
+            return console.error("El producto no existe")
+
+        if (producto.title) {
+            prodArchivo[prodIndex].title = producto.title;
         }
 
-        if (producto.description && prod.description != producto.description) {
-            prod.description = producto.description;
+        if (producto.description) {
+            prodArchivo[prodIndex].description = producto.description;
         }
 
-        if (producto.price && prod.price != producto.price) {
-            prod.price = producto.price;
+        if (producto.price) {
+            prodArchivo[prodIndex].price = producto.price;
         }
 
-        if (producto.thumbnail && prod.thumbnail != producto.thumbnail) {
-            prod.thumbnail = producto.thumbnail;
+        if (producto.thumbnail) {
+            prodArchivo[prodIndex].thumbnail = producto.thumbnail;
         }
 
-        if (producto.code && prod.code != producto.code) {
-            if (prodArchivo.find(prod => prod.code === producto.code)) return console.error("El producto ya existe");
-            prod.code = producto.code;
+        if (producto.code) {
+            prodArchivo[prodIndex].code = producto.code;
         }
 
-        if (producto.stock && prod.stock != producto.stock) {
-            prod.stock = producto.stock;
+        if (producto.stock) {
+            prodArchivo[prodIndex].stock = producto.stock;
         }
 
         fs.writeFileSync(this.path, JSON.stringify(prodArchivo));
@@ -92,12 +93,3 @@ class ProductManager {
 }
 
 const productos = new ProductManager([], "./productos.json");
-
-productos.addProducts({
-    title: "“producto prueba”",
-    description: "”Este es un producto prueba”",
-    price: 200,
-    thumbnail: "”Sin imagen”",
-    code: "”abc123”",
-    stock: 25
-})
