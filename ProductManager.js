@@ -37,7 +37,7 @@ module.exports = class ProductManager {
             await fs.promises.writeFile(this.path, save);
         }
         catch (error) {
-            throw new Error("error")
+            throw new Error("Error:", error)
         }
 
     }
@@ -48,7 +48,7 @@ module.exports = class ProductManager {
             const array = JSON.parse(products)
             return limit ? array.slice(0, limit) : array;
         } catch (error) {
-            throw new Error(error)
+            throw new Error("Error:", error)
         }
     }
 
@@ -61,7 +61,7 @@ module.exports = class ProductManager {
             const prodIndex = products.find(prod => prod.id === id)
             return prodIndex ? prodIndex : ["Error: el producto no existe"];
         } catch (error) {
-            throw new Error(error)
+            throw new Error("Error:", error)
         }
 
     }
@@ -110,7 +110,7 @@ module.exports = class ProductManager {
             const prod = prodArchivo.filter(prod => prod.id != id)
             prod ? fs.promises.writeFile(this.path, JSON.stringify(prod)) : console.log("Not Found");
         } catch (error) {
-            throw new Error(error)
+            throw new Error("Error:", error)
         }
     };
 
