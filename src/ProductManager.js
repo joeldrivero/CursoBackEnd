@@ -21,7 +21,7 @@ module.exports = class ProductManager {
                 save = JSON.stringify([productoNuevo])
             }
             else {
-                const prod = this.getProducts();
+                const prod = this.getProductsSync();
 
                 if (prod.length > 0) {
                     if (prod.find(prod => prod.code === productoNuevo.code)) return console.error("El producto ya existe");
@@ -47,6 +47,16 @@ module.exports = class ProductManager {
             const products = await fs.promises.readFile(this.path, 'utf-8');
             const array = JSON.parse(products)
             return limit ? array.slice(0, limit) : array;
+        } catch (error) {
+            throw new Error("Error:", error)
+        }
+    }
+
+    getProductsSync() {
+        try {
+            const products = fs.readFileSync(this.path, 'utf-8');
+            const array = JSON.parse(products)
+            return array
         } catch (error) {
             throw new Error("Error:", error)
         }
@@ -113,8 +123,6 @@ module.exports = class ProductManager {
             throw new Error("Error:", error)
         }
     };
-
-
 
 }
 
