@@ -12,7 +12,7 @@ module.exports = class ProductManager {
     async addProducts(productoNuevo) {
         try {
             let save = {};
-            if (!productoNuevo.title || !productoNuevo.description || !productoNuevo.price || !productoNuevo.thumbnail || !productoNuevo.code || !productoNuevo.stock) {
+            if (!productoNuevo.title || !productoNuevo.description || !productoNuevo.price || !productoNuevo.code || !productoNuevo.stock) {
                 return console.error("Por favor, complete todos los campos obligatorios");
             }
 
@@ -37,7 +37,7 @@ module.exports = class ProductManager {
             await fs.promises.writeFile(this.path, save);
         }
         catch (error) {
-            throw new Error("Error:", error)
+            throw error = "Error al agregar el producto";
         }
 
     }
@@ -48,7 +48,7 @@ module.exports = class ProductManager {
             const array = JSON.parse(products)
             return limit ? array.slice(0, limit) : array;
         } catch (error) {
-            throw new Error("Error:", error)
+            throw error = "Error los productos";
         }
     }
 
@@ -58,11 +58,21 @@ module.exports = class ProductManager {
             const array = JSON.parse(products)
             return array
         } catch (error) {
-            throw new Error("Error:", error)
+            throw error = "Error los productos";
         }
     }
 
+    getProductsToCart(id) {
 
+        try {
+            const products = this.getProductsSync()
+            const prodIndex = products.findIndex(prod => prod.id === id)
+            return prodIndex ? prodIndex : { error: "Error: el producto no existe" };
+        } catch (error) {
+            throw error = "Error al obtener el producto";
+        }
+
+    }
 
     async getProductsById(id) {
 
@@ -71,46 +81,51 @@ module.exports = class ProductManager {
             const prodIndex = products.find(prod => prod.id === id)
             return prodIndex ? prodIndex : ["Error: el producto no existe"];
         } catch (error) {
-            throw new Error("Error:", error)
+            throw error = "Error al obtener el producto";
         }
 
     }
 
     async updateProduct(producto, id) {
+        try {
+            const prodArchivo = await this.getProducts();
+            const prodIndex = prodArchivo.findIndex(prod => prod.id === id)
+            console.log(prodIndex)
 
-        const prodArchivo = await this.getProducts();
-        const prodIndex = prodArchivo.findIndex(prod => prod.id === id)
-        console.log(prodIndex)
 
+            if (prodIndex === -1)
+                return console.error("El producto no existe")
 
-        if (prodIndex === -1)
-            return console.error("El producto no existe")
+            if (producto.title) {
+                prodArchivo[prodIndex].title = producto.title;
+            }
 
-        if (producto.title) {
-            prodArchivo[prodIndex].title = producto.title;
+            if (producto.description) {
+                prodArchivo[prodIndex].description = producto.description;
+            }
+
+            if (producto.price) {
+                prodArchivo[prodIndex].price = producto.price;
+            }
+
+            if (producto.thumbnail) {
+                prodArchivo[prodIndex].thumbnail = producto.thumbnail;
+            }
+
+            if (producto.code) {
+                prodArchivo[prodIndex].code = producto.code;
+            }
+
+            if (producto.stock) {
+                prodArchivo[prodIndex].stock = producto.stock;
+            }
+
+            fs.promises.writeFile(this.path, JSON.stringify(prodArchivo));
+        } catch (error) {
+            throw error = "Error al actualizar el producto";
         }
 
-        if (producto.description) {
-            prodArchivo[prodIndex].description = producto.description;
-        }
 
-        if (producto.price) {
-            prodArchivo[prodIndex].price = producto.price;
-        }
-
-        if (producto.thumbnail) {
-            prodArchivo[prodIndex].thumbnail = producto.thumbnail;
-        }
-
-        if (producto.code) {
-            prodArchivo[prodIndex].code = producto.code;
-        }
-
-        if (producto.stock) {
-            prodArchivo[prodIndex].stock = producto.stock;
-        }
-
-        fs.promises.writeFile(this.path, JSON.stringify(prodArchivo));
     };
 
 
@@ -120,7 +135,7 @@ module.exports = class ProductManager {
             const prod = prodArchivo.filter(prod => prod.id != id)
             prod ? fs.promises.writeFile(this.path, JSON.stringify(prod)) : console.log("Not Found");
         } catch (error) {
-            throw new Error("Error:", error)
+            throw error = "Error al borrar el producto";
         }
     };
 
