@@ -165,7 +165,7 @@ module.exports = class ProductManager {
     async deleteProduct(id) {
         try {
             const prodFs = await this.getProducts();
-            const prod = prodFss.filter(prod => prod.id != id)
+            const prod = prodFs.filter(prod => prod.id != id)
             prod ? fs.promises.writeFile(this.path, JSON.stringify(prod)) : console.log("Not Found");
         } catch (error) {
             throw error = "Error al borrar el producto";
