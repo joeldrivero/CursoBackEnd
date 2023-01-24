@@ -1,5 +1,7 @@
 const fs = require('fs');
-let contador = 0;
+const { v4: uuidv4 } = require('uuid');
+
+
 
 module.exports = class ProductManager {
 
@@ -7,31 +9,40 @@ module.exports = class ProductManager {
         this.path = path;
     }
 
-    static id = 0;
-
-    async addProducts(productoNuevo) {
+    async addProducts(newProduct) {
         try {
             let save = {};
-            if (!productoNuevo.title || !productoNuevo.description || !productoNuevo.price || !productoNuevo.code || !productoNuevo.stock) {
-                return console.error("Por favor, complete todos los campos obligatorios");
+            if (!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.code || !newProduct.stock || !newProduct.category) {
+                return error = "Por favor, complete todos los campos obligatorios";
+            }
+
+            if (typeof newProduct.status != "boolean") {
+                return error = "Por favor, en el campo status, ingrese true o false";
+            }
+
+            if (newProduct.status != false) {
+                newProduct.status = true;
+            }
+
+            if (!newProduct.thumbnails) {
+                newProduct.thumbnails = [];
             }
 
             if (!fs.existsSync(this.path)) {
-                productoNuevo.id = contador;
-                save = JSON.stringify([productoNuevo])
+                newProduct.id = uuidv4();
+                save = JSON.stringify([newProduct])
             }
             else {
                 const prod = this.getProductsSync();
 
                 if (prod.length > 0) {
-                    if (prod.find(prod => prod.code === productoNuevo.code)) return console.error("El producto ya existe");
-                    contador = prod.length;
-                    productoNuevo.id = contador;
-                    save = JSON.stringify([...prod, productoNuevo])
+                    if (prod.find(prod => prod.code === newProduct.code)) return console.error("El producto ya existe");
+                    newProduct.id = uuidv4();
+                    save = JSON.stringify([...prod, newProduct])
                 }
                 else {
-                    productoNuevo.id = 0;
-                    save = JSON.stringify([productoNuevo])
+                    newProduct.id = uuidv4();
+                    save = JSON.stringify([newProduct])
                 }
             }
             await fs.promises.writeFile(this.path, save);
@@ -86,10 +97,24 @@ module.exports = class ProductManager {
 
     }
 
+
+    getProductsByIdSync(id) {
+
+        try {
+            const products = this.getProductsSync()
+            const prodIndex = products.findIndex(prod => prod.id === id)
+            return prodIndex;
+        } catch (error) {
+            throw error = "Error al obtener el producto";
+        }
+
+    }
+
+
     async updateProduct(producto, id) {
         try {
-            const prodArchivo = await this.getProducts();
-            const prodIndex = prodArchivo.findIndex(prod => prod.id === id)
+            const prodFs = await this.getProducts();
+            const prodIndex = prodFs.findIndex(prod => prod.id === id)
             console.log(prodIndex)
 
 
@@ -97,30 +122,38 @@ module.exports = class ProductManager {
                 return console.error("El producto no existe")
 
             if (producto.title) {
-                prodArchivo[prodIndex].title = producto.title;
+                prodFs[prodIndex].title = producto.title;
             }
 
             if (producto.description) {
-                prodArchivo[prodIndex].description = producto.description;
+                prodFs[prodIndex].description = producto.description;
             }
 
             if (producto.price) {
-                prodArchivo[prodIndex].price = producto.price;
+                prodFs[prodIndex].price = producto.price;
             }
 
-            if (producto.thumbnail) {
-                prodArchivo[prodIndex].thumbnail = producto.thumbnail;
+            if (producto.thumbnails) {
+                prodFs[prodIndex].thumbnail = producto.thumbnails;
             }
 
             if (producto.code) {
-                prodArchivo[prodIndex].code = producto.code;
+                prodFs[prodIndex].code = producto.code;
             }
 
             if (producto.stock) {
-                prodArchivo[prodIndex].stock = producto.stock;
+                prodFs[prodIndex].stock = producto.stock;
             }
 
-            fs.promises.writeFile(this.path, JSON.stringify(prodArchivo));
+            if (producto.category) {
+                prodFs[prodIndex].stock = producto.stock;
+            }
+
+            if (producto.status && typeof producto.status == "boolean") {
+                prodFs[prodIndex].status = producto.status;
+            }
+
+            fs.promises.writeFile(this.path, JSON.stringify(prodFs));
         } catch (error) {
             throw error = "Error al actualizar el producto";
         }
@@ -131,13 +164,12 @@ module.exports = class ProductManager {
 
     async deleteProduct(id) {
         try {
-            const prodArchivo = await this.getProducts();
-            const prod = prodArchivo.filter(prod => prod.id != id)
+            const prodFs = await this.getProducts();
+            const prod = prodFss.filter(prod => prod.id != id)
             prod ? fs.promises.writeFile(this.path, JSON.stringify(prod)) : console.log("Not Found");
         } catch (error) {
             throw error = "Error al borrar el producto";
         }
     };
-
 }
 

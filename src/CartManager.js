@@ -1,6 +1,5 @@
 const fs = require('fs');
-const { stringify } = require('querystring');
-let contador = 0;
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = class Cart {
     constructor(path) {
@@ -20,13 +19,12 @@ module.exports = class Cart {
                 const c = this.getCartSync();
 
                 if (c.length > 0) {
-                    contador = c.length;
-                    cart.id = contador;
+                    cart.id = uuidv4();
                     cart.products = [];
                     save = JSON.stringify([...c, cart])
                 }
                 else {
-                    cart.id = 0;
+                    cart.id = uuidv4();
                     cart.products = [];
                     save = JSON.stringify([cart])
                 }
@@ -60,36 +58,38 @@ module.exports = class Cart {
         }
     }
 
-    async agregarProducto(idProducto, idCarrito) {
+    async addProduct(idProduct, idCart) {
 
         try {
             const ProductManager = require("../src/ProductManager")
-            const productos = new ProductManager("./src/productos.json")
+            const products = new ProductManager("./src/products.json")
 
 
-            const carrito = this.getCartSync()
-            const cartIndex = carrito.findIndex(carro => carro.id === idCarrito)
+            const cart = this.getCartSync()
+            const cartIndex = cart.findIndex(carro => carro.id === idCart)
+            const findProduct = products.getProductsByIdSync(idProduct)
 
+            if (findProduct == -1) {
+                return error = ["El Producto no existe"];
+            }
 
-
-            if (carrito[cartIndex].products.length == 0) {
-                carrito[cartIndex].products = [{ id: idProducto, quantity: 1 }]
+            if (cart[cartIndex].products.length == 0) {
+                cart[cartIndex].products = [{ id: idProduct, quantity: 1 }]
             }
             else {
-                let prod = carrito[cartIndex].products.findIndex(elem => elem.id === idProducto)
+                let prod = cart[cartIndex].products.findIndex(elem => elem.id === idProduct)
                 if (prod != -1) {
-                    carrito[cartIndex].products[prod].quantity += 1;
+                    cart[cartIndex].products[prod].quantity += 1;
                 }
                 else {
-                    carrito[cartIndex].products = [...carrito[cartIndex].products, { id: idProducto, quantity: 1 }]
+                    cart[cartIndex].products = [...cart[cartIndex].products, { id: idProduct, quantity: 1 }]
                 }
 
             };
 
-
-            fs.promises.writeFile(this.path, JSON.stringify(carrito))
+            fs.promises.writeFile(this.path, JSON.stringify(cart))
         } catch (error) {
-            throw error = "Error al agregar el producto al carrito";
+            throw error;
         }
 
 
