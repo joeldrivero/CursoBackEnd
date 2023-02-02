@@ -9,6 +9,50 @@ module.exports = class ProductManager {
         this.path = path;
     }
 
+    addProductsSync(newProduct) {
+        try {
+            let save = {};
+            if (!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.code || !newProduct.stock || !newProduct.category) {
+                return error = "Por favor, complete todos los campos obligatorios";
+            }
+
+            if (typeof newProduct.status != "boolean") {
+                return error = "Por favor, en el campo status, ingrese true o false";
+            }
+
+            if (newProduct.status != false) {
+                newProduct.status = true;
+            }
+
+            if (!newProduct.thumbnails) {
+                newProduct.thumbnails = [];
+            }
+
+            if (!fs.existsSync(this.path)) {
+                newProduct.id = uuidv4();
+                save = JSON.stringify([newProduct])
+            }
+            else {
+                const prod = this.getProductsSync();
+
+                if (prod.length > 0) {
+                    if (prod.find(prod => prod.code === newProduct.code)) return console.error("El producto ya existe");
+                    newProduct.id = uuidv4();
+                    save = JSON.stringify([...prod, newProduct])
+                }
+                else {
+                    newProduct.id = uuidv4();
+                    save = JSON.stringify([newProduct])
+                }
+            }
+            fs.writeFile(this.path, save);
+        }
+        catch (error) {
+            throw new Error()
+        }
+
+    }
+
     async addProducts(newProduct) {
         try {
             let save = {};
@@ -50,7 +94,6 @@ module.exports = class ProductManager {
         catch (error) {
             throw error = "Error al agregar el producto";
         }
-
     }
 
     async getProducts(limit) {

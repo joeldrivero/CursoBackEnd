@@ -1,13 +1,27 @@
-const express = require("express");
 require("dotenv").config()
-const routes = require("../routes");
+const app = require("./index")
+const { Server } = require("socket.io")
 const port = process.env.PORT;
-const app = express();
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const ProductManager = require("./ProductManager")
+const productos = new ProductManager("./src/products.json")
 
-routes(app)
-
-app.listen(port, () => {
+const httpServer = app.listen(port, () => {
     console.log(`Servidor iniciado en la url http://localhost:${port} puerto ${port}`)
 })
+
+const io = new Server(httpServer)
+
+io.on('connection', socket => {
+
+    console.log(`Nueva conexion ${socket.id}`)
+
+    socket.emit("getProducts", productos.getProductsSync())
+
+    socket.on('addProduct', data => {
+        socket.emit('getProducts', productos.getProductsSync())
+    })
+
+})
+
+
+

@@ -61,8 +61,8 @@ module.exports = class Cart {
     async addProduct(idProduct, idCart) {
 
         try {
-            const ProductManager = require("../src/ProductManager")
-            const products = new ProductManager("./src/products.json")
+            const ProductManager = require("./ProductManager")
+            const products = new ProductManager("./products.json")
 
 
             const cart = this.getCartSync()

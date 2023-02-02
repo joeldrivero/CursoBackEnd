@@ -1,21 +1,38 @@
-//ACA VA TODOS LOS METODOS
-const ProductManager = require("../src/ProductManager")
-const productos = new ProductManager("./src/products.json")
-const { Router } = require("express")
 
+const ProductManager = require("../ProductManager")
+const productos = new ProductManager("./src/products.json")
+const { io } = require("socket.io-client")
+const { Router } = require("express")
 const router = Router();
+const socket = io();
 
 router.get("/", getProducts);
+router.get("/realtimeproducts", getProductsSocket);
 router.get("/:idProduct", getProductsById);
 router.post("/", addProduct);
 router.put("/:idProduct", updateProduct);
 router.delete("/:idProduct", deleteProduct);
 
-async function getProducts(req, res) {
+async function getProductsSocket(req, res) {
+
     try {
         let limit = parseInt(req.query.limit);
         const allProductos = await productos.getProducts(limit);
-        res.send(allProductos)
+        res.render("realtimeproducts.handlebars", { allProductos });
+
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
+
+}
+
+async function getProducts(req, res) {
+
+    try {
+        let limit = parseInt(req.query.limit);
+        const allProductos = await productos.getProducts(limit);
+        res.render("home.handlebars", { allProductos });
+
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
