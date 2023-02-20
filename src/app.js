@@ -15,13 +15,11 @@ io.on('connection', socket => {
 
     console.log(`Nueva conexion ${socket.id}`)
 
-    socket.emit("getProducts", productos.getProductsSync())
+/*     socket.emit("getProducts", productos.getProductsSync())
 
     socket.on('addProduct', data => {
         socket.emit('getProducts', productos.getProductsSync())
-    })
+    }) */
 
 })
-
-
 

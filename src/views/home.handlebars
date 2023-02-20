@@ -10,6 +10,7 @@
         <th scope="col">Descripcion</th>
         <th scope="col">Precio</th>
         <th scope="col">Categoria</th>
+        <th scope="col">Cart</th>
       </tr>
     </thead>
     <tbody>
@@ -20,6 +21,7 @@
         <td>{{this.description}}</td>
         <td>{{this.price}}</td>
         <td>{{this.category}}</td>
+        <td><button id="buttonAddCart" onclick="addCart()">ADD CART</button></td>
       </tr>
       {{/each}}
     </tbody>
@@ -28,3 +30,8 @@
   <h2>No hay productos en la lista</h2>
   {{/if}}
 </div>
+<script>
+  function addCart() {
+    console.log("holita")
+  }
+</script>

@@ -1,5 +1,6 @@
-const socket = io()
+/* const socket = io()
 const productForm = document.getElementById('productForm')
+var paginate = require('handlebars-paginate');
 
 socket.on('getProducts', products => {
   document.getElementById('productList').innerHTML = updateTable(products)
@@ -7,8 +8,15 @@ socket.on('getProducts', products => {
 
 const url = 'http://localhost:8080/api/products'
 
-productForm.addEventListener('submit', handleSubmit_productForm)
+productForm.addEventListener('submit', handleSubmit_productForm) */
+console.log("HOLA")
 
+document.getElementById("buttonAddCart").addEventListener("click",addCart)
+
+function addCart(event) {
+  console.log(event)
+}
+/* 
 function handleSubmit_productForm(event) {
   event.preventDefault()
   const { title, description, code, price, stock, category } = event.target
@@ -78,3 +86,4 @@ function updateTable(products) {
   let html = template({ allProductos: products });
   return html;
 }
+ */
