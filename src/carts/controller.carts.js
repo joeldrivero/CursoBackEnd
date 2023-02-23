@@ -2,7 +2,6 @@ const Cart = require("../CartManager")
 const cart = new Cart("./src/cart.json")
 const cartModel = require("../models/carts.model")
 const { engine } = require("express-handlebars")
-
 const { Router } = require("express")
 const productModel = require("../models/products.model")
 
@@ -25,11 +24,9 @@ router.post("/:idCart/product/:idProduct", async (req, res) => {
         let idProduct = req.params.idProduct;
 
         let getProduct = await productModel.findOne({ _id: idProduct })
-        console.log(getProduct)
-        let getCart = await cartModel.findOne({ _id: idCart })
-        console.log(getCart)
 
-        getCart.products.push({ products: idProduct })
+        let getCart = await cartModel.findOne({ _id: idCart })
+  getCart.products.push({ products: idProduct })
         let result = await cartModel.updateOne({ _id: idCart }, getCart)
         console.log(result)
 

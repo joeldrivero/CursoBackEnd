@@ -21,7 +21,7 @@
         <td>{{this.description}}</td>
         <td>{{this.price}}</td>
         <td>{{this.category}}</td>
-        <td><button id="buttonAddCart" onclick="addCart()">ADD CART</button></td>
+        <td><button id="buttonAddCart" onclick="addCart('{{this._id}}')">ADD CART</button></td>
       </tr>
       {{/each}}
     </tbody>
