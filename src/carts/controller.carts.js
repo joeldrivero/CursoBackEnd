@@ -11,9 +11,9 @@ router.post("/", async (req, res) => {
     try {
         let products = []
         let result = await cartModel.create({ products });
-        res.json({ result: "success", payload: products })
+        res.json({ status: "success", payload: result })
     } catch (error) {
-
+        return res.status(400).send({ status: "error", error: error })
     }
 })
 
@@ -22,16 +22,11 @@ router.post("/:idCart/product/:idProduct", async (req, res) => {
     try {
         let idCart = req.params.idCart;
         let idProduct = req.params.idProduct;
-
-        let getProduct = await productModel.findOne({ _id: idProduct })
-
-        let getCart = await cartModel.findOne({ _id: idCart })
-  getCart.products.push({ products: idProduct })
-        let result = await cartModel.updateOne({ _id: idCart }, getCart)
-        console.log(result)
+        let result = await cartModel.updateOne({ _id: idCart }, { $push: { products: { products: idProduct} } })
+        res.json({ status: "success", payload: result })
 
     } catch (error) {
-
+        return res.status(400).send({ status: "error", error: error })
     }
 
 })
@@ -40,27 +35,22 @@ router.delete("/:idCart/product/:idProduct", async (req, res) => {
     try {
         let idCart = req.params.idCart;
         let idProduct = req.params.idProduct;
+        let result = await cartModel.updateOne({ _id: idCart }, { $pull: { products: { products: idProduct } } })
+        res.json({ status: "success", payload: result })
 
-        let getProduct = await productModel.findOne({ _id: idProduct })
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
 
-        console.log(getProduct)
+})
 
+router.delete("/:idCart", async (req, res) => {
+    try {
+        let idCart = req.params.idCart;
         let getCart = await cartModel.findOne({ _id: idCart })
-
-        console.log(getCart.products)
-
-        let products = []
-
-        for (let i = 0; i <= getCart.products.length - 1; i++) {
-            if (getCart.products[i].products.toString() != getProduct._id.toString())
-                products.push(getCart.products[i])
-        }
-
-        getCart.products.push({ products: products })
-
+        getCart.products = []
         let result = await cartModel.updateOne({ _id: idCart }, getCart)
-        console.log(result)
-
+        res.json({ status: "success", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -76,5 +66,18 @@ router.get("/:idCart", async (req, res) => {
         return res.status(400).send({ status: "error", error: error })
     }
 })
+
+router.get("/carts/:idCart", async (req, res) => {
+    try {
+        let idCart = req.params.idCart;
+        const cart = await cartModel.findOne({ _id: idCart }).populate('products.products')
+        var allProductos = JSON.parse(JSON.stringify(cart._doc.products))
+        res.render("cart.handlebars", { allProductos });
+
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
+})
+
 
 module.exports = router;

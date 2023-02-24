@@ -4,7 +4,6 @@ const productos = new ProductManager("./src/products.json")
 const { io } = require("socket.io-client")
 const { Router } = require("express")
 const productModel = require("../models/products.model")
-const { v4: uuidv4 } = require('uuid');
 const router = Router();
 const socket = io();
 
@@ -20,10 +19,102 @@ router.get("/", async (req, res) => {
             pag = parseInt(req.query.page);
         }
 
-        const product = await productModel.paginate({}, { limit: lim, page: pag })
+        if (req.query.category) {
 
+            if (req.query.sort) {
+                const product = await productModel.paginate({ category: req.query.category.toString() }, { limit: lim, page: pag, sort: { price: req.query.sort.toString() } })
+                if (product.hasNextPage) {
+                    product.nextLink = `http://localhost:8080/api/products?category=${req.query.category}&sort=${req.query.sort}&limit=${lim}&page=${product.nextPage}`
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&sort=${req.query.sort}&limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                else {
+                    product.nextLink = null
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&sort=${req.query.sort}&limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                res.json({ result: "success", payload: product })
+            }
+            else {
+                if (req.query.sort) {
+                    const product = await productModel.paginate({ category: req.query.category.toString() }, { limit: lim, page: pag })
+                    if (product.hasNextPage) {
+                        product.nextLink = `http://localhost:8080/api/products?category=${req.query.category}&limit=${lim}&page=${product.nextPage}`
+                        if (product.hasPrevPage) {
+                            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&limit=${lim}&page=${product.prevPage}`
+                        }
+                        else {
+                            product.prevLink = null
+                        }
+                    }
+                    else {
+                        product.nextLink = null
+                        if (product.hasPrevPage) {
+                            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&sort=${req.query.sort}&limit=${lim}&page=${product.prevPage}`
+                        }
+                        else {
+                            product.prevLink = null
+                        }
+                    }
+                    res.json({ result: "success", payload: product })
+                }
+            }
+        }
+        else {
+            if (req.query.sort) {
+                const product = await productModel.paginate({}, { limit: lim, page: pag, sort: { price: req.query.sort.toString() } })
+                if (product.hasNextPage) {
+                    product.nextLink = `http://localhost:8080/api/products?sort=${req.query.sort}&limit=${lim}&page=${product.nextPage}`
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?sort=${req.query.sort}&limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                else {
+                    product.nextLink = null
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?sort=${req.query.sort}&limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                res.json({ result: "success", payload: product })
+            }
+            else {
+                const product = await productModel.paginate({}, { limit: lim, page: pag })
+                if (product.hasNextPage) {
+                    product.nextLink = `http://localhost:8080/api/products?limit=${lim}&page=${product.nextPage}`
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                else {
+                    product.nextLink = null
+                    if (product.hasPrevPage) {
+                        product.prevLink = `http://localhost:8080/api/products?limit=${lim}&page=${product.prevPage}`
+                    }
+                    else {
+                        product.prevLink = null
+                    }
+                }
+                res.json({ result: "success", payload: product })
+            }
 
-        res.json({ result: "success", payload: product })
+        }
     } catch (error) {
 
     }
@@ -41,8 +132,28 @@ router.get("/products", async (req, res) => {
             pag = parseInt(req.query.page);
         }
 
-        const product = await productModel.paginate({}, { limit: 10, page: 1 })
-        var allProductos = JSON.parse(JSON.stringify(product.docs))
+        const product = await productModel.paginate({}, { limit: lim, page: pag })
+
+        if (product.hasNextPage) {
+            product.nextLink = `http://localhost:8080/products?limit=${lim}&page=${product.nextPage}`
+            if (product.hasPrevPage) {
+                product.prevLink = `http://localhost:8080/products?limit=${lim}&page=${product.prevPage}`
+            }
+            else {
+                product.prevLink = null
+            }
+        }
+        else {
+            product.nextLink = null
+            if (product.hasPrevPage) {
+                product.prevLink = `http://localhost:8080/products?limit=${lim}&page=${product.prevPage}`
+            }
+            else {
+                product.prevLink = null
+            }
+        }
+
+        var allProductos = JSON.parse(JSON.stringify(product))
         res.render("home.handlebars", { allProductos });
     } catch (error) {
 
@@ -69,7 +180,7 @@ router.post("/", async (req, res) => {
         let result = await productModel.create({
             title, description, code, price, status, stock, category, thumbnails
         })
-        res.send({ status: "succes", payload: result })
+        res.send({ status: "success", payload: result })
     }
 
     catch {
@@ -77,21 +188,10 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:idProduct", updateProduct);
-router.delete("/:idProduct", deleteProduct);
+router.put("/:idProduct", updateProduct); //TODO
+router.delete("/:idProduct", deleteProduct); //TODO
 
 
-async function getProductsSocket(req, res) {
-    try {
-        let limit = parseInt(req.query.limit);
-        const allProductos = await productos.getProducts(limit);
-        res.render("realtimeproducts.handlebars", { allProductos });
-
-
-    } catch (error) {
-        return res.status(400).send({ status: "error", error: error })
-    }
-}
 
 async function updateProduct(req, res) {
     try {
@@ -115,4 +215,25 @@ async function deleteProduct(req, res) {
 
 }
 
+
+function linkPage(product) {
+    if (product.hasNextPage) {
+        product.nextLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag + 1}`
+        if (product.hasPrevPage) {
+            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag - 1}`
+        }
+        else {
+            product.prevLink = null
+        }
+    }
+    else {
+        product.nextLink = null
+        if (product.hasPrevPage) {
+            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag - 1}`
+        }
+        else {
+            product.prevLink = null
+        }
+    }
+}
 module.exports = router;
