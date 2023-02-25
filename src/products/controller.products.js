@@ -166,17 +166,23 @@ router.get("/:idProduct", async (req, res) => {
         const product = await productModel.findOne({ _id: idProduct })
         res.json({ result: "success", payload: product })
     } catch (error) {
-
+        return res.status(400).send({ status: "error", error: error })
     }
 });
 
 router.post("/", async (req, res) => {
 
     let { title, description, code, price, status, stock, category, thumbnails } = req.body
+
     try {
         if (!title || !description || !price || !code || !stock || !category)
-            return res.sent({ status: "error", error: "Por favor complete los campos obligatorios" })
+            return res.send({ status: "error", error: "Por favor complete los campos obligatorios" })
 
+        let exist = await productModel.findOne({ code: code })
+
+        if(exist){
+            return res.send({ status: "error", error: "El codigo del producto ya existe" })
+        }
         let result = await productModel.create({
             title, description, code, price, status, stock, category, thumbnails
         })
@@ -184,7 +190,7 @@ router.post("/", async (req, res) => {
     }
 
     catch {
-
+        return res.status(400).send({ status: "error", error: error })
     }
 });
 

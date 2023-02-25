@@ -22,13 +22,60 @@ router.post("/:idCart/product/:idProduct", async (req, res) => {
     try {
         let idCart = req.params.idCart;
         let idProduct = req.params.idProduct;
-        let result = await cartModel.updateOne({ _id: idCart }, { $push: { products: { products: idProduct} } })
+
+        let result = await cartModel.updateOne({ _id: idCart }, {
+            $push: {
+                products: {
+                    $each: [
+                        { products: idProduct, qty: 1 }
+                    ]
+                }
+            }
+        })
+
         res.json({ status: "success", payload: result })
 
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
+})
 
+router.put("/:idCart", async (req, res) => {
+
+    try {
+        let idCart = req.params.idCart;
+        let array = req.body
+
+        let result = await cartModel.updateOne({ _id: idCart }, { $push: { products: { $each: array } } })
+
+        res.json({ status: "success", payload: result })
+
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
+})
+
+
+router.put("/:idCart/product/:idProduct", async (req, res) => {
+
+    try {
+        let idCart = req.params.idCart;
+        let idProduct = req.params.idProduct;
+        let { quantity } = req.body
+
+        /*    let result = await cartModel.updateOne({ _id: idCart, "products.products": idProduct}, { $set: { "products.products.$.qty": quantity } }) */
+        let result = await cartModel.updateOne(
+            { _id: idCart },
+            { $set: { "products.products.$[elem].qty": quantity } },
+            { arrayFilters: [{ "elem.products": idProduct }] }
+        )
+
+
+        res.json({ status: "success", payload: result })
+
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
 })
 
 router.delete("/:idCart/product/:idProduct", async (req, res) => {
