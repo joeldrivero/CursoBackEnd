@@ -3,12 +3,13 @@ const express = require("express");
 const handlebars = require("express-handlebars");
 const mongoose = require("mongoose");
 const routes = require("./routes");
-
+const user = process.env.USER;
+const password = process.env.PASSWORD
 
 const app = express();
 
 app.use(express.json())
-mongoose.connect("mongodb+srv://coderUser:coderbackend@backend.0hlxsge.mongodb.net/?retryWrites=true&w=majority", error => {
+mongoose.connect(`mongodb+srv://${user}:${password}@backend.0hlxsge.mongodb.net/?retryWrites=true&w=majority`, error => {
     if (error) {
         console.log("No se pudo conectar")
         process.exit()
