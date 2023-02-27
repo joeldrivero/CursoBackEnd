@@ -180,7 +180,7 @@ router.post("/", async (req, res) => {
 
         let exist = await productModel.findOne({ code: code })
 
-        if(exist){
+        if (exist) {
             return res.send({ status: "error", error: "El codigo del producto ya existe" })
         }
         let result = await productModel.create({
@@ -194,8 +194,70 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:idProduct", updateProduct); //TODO
-router.delete("/:idProduct", deleteProduct); //TODO
+router.put("/:idProduct", async (req, res) => {
+    try {
+        let idProduct = req.params.idProduct;
+        let { title, description, code, price, status, stock, category, thumbnails } = req.body
+        const product = await productModel.findOne({ _id: idProduct })
+        if (product) {
+            if (code) {
+                let exist = await productModel.findOne({ code: code })
+                if (exist) {
+                    return res.send({ status: "error", error: "El codigo del producto ya existe" })
+                }
+                else {
+                    product.code = code;
+                }
+            }
+
+            if (title) {
+                product.title = title;
+            }
+
+            if (description) {
+                product.description = description;
+            }
+
+            if (price) {
+                product.price = price;
+            }
+
+            if (thumbnails) {
+                product.thumnails = thumbnails;
+            }
+
+            if (stock) {
+                product.stock = stock;
+            }
+
+            if (category) {
+                product.stock = stock;
+            }
+
+            if (status && typeof status == "boolean") {
+                product.status = status;
+            }
+
+            let result = await productModel.updateOne({ _id: idProduct }, product)
+            res.send({ status: "success", payload: result })
+        }
+        else {
+            return res.status(400).send({ status: "error", error: "El Producto no existe" })
+        }
+    }
+    catch (error) { return res.status(400).send({ status: "error", error: error }) }
+});
+
+router.delete("/:idProduct", async (req, res) => {
+    try {
+        let idProduct = req.params.idProduct;
+        const product = await productModel.findOneAndDelete({ _id: idProduct })
+        res.json({ result: "success", payload: product })
+    } catch (error) {
+        return res.status(400).send({ status: "error", error: error })
+    }
+
+});
 
 
 
@@ -210,36 +272,4 @@ async function updateProduct(req, res) {
     }
 }
 
-async function deleteProduct(req, res) {
-    try {
-        let idProduct = req.params.idProduct;
-        const updateProducto = await productos.deleteProduct(idProduct);
-        res.status(200).send({ status: "Producto eliminado correctamente", mesagge: "Producto eliminado correctamente" })
-    } catch (error) {
-        return res.status(400).send({ status: "error", error: error })
-    }
-
-}
-
-
-function linkPage(product) {
-    if (product.hasNextPage) {
-        product.nextLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag + 1}`
-        if (product.hasPrevPage) {
-            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag - 1}`
-        }
-        else {
-            product.prevLink = null
-        }
-    }
-    else {
-        product.nextLink = null
-        if (product.hasPrevPage) {
-            product.prevLink = `http://localhost:8080/api/products?category=${req.query.category}&&sort=${req.query.sort}&&limit=${lim}&&page=${pag - 1}`
-        }
-        else {
-            product.prevLink = null
-        }
-    }
-}
 module.exports = router;

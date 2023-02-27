@@ -3,7 +3,6 @@ const cart = new Cart("./src/cart.json")
 const cartModel = require("../models/carts.model")
 const { engine } = require("express-handlebars")
 const { Router } = require("express")
-const productModel = require("../models/products.model")
 
 const router = Router();
 
@@ -22,19 +21,26 @@ router.post("/:idCart/product/:idProduct", async (req, res) => {
     try {
         let idCart = req.params.idCart;
         let idProduct = req.params.idProduct;
-
-        let result = await cartModel.updateOne({ _id: idCart }, {
-            $push: {
-                products: {
-                    $each: [
-                        { products: idProduct, qty: 1 }
-                    ]
+        var exists = await cartModel.find({ products: { $elemMatch: { products: idProduct } } })
+        if (exists.length != 0) {
+            let result = await cartModel.updateOne(
+                { _id: idCart, "products.products": idProduct },
+                { $inc: { "products.$.qty": 1 } }
+            )
+            res.json({ status: "success", payload: result })
+        }
+        else {
+            let result = await cartModel.updateOne({ _id: idCart }, {
+                $push: {
+                    products: {
+                        $each: [
+                            { products: idProduct, qty: 1 }
+                        ]
+                    }
                 }
-            }
-        })
-
-        res.json({ status: "success", payload: result })
-
+            })
+            res.json({ status: "success", payload: result })
+        }
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -63,13 +69,10 @@ router.put("/:idCart/product/:idProduct", async (req, res) => {
         let idProduct = req.params.idProduct;
         let { quantity } = req.body
 
-        /*    let result = await cartModel.updateOne({ _id: idCart, "products.products": idProduct}, { $set: { "products.products.$.qty": quantity } }) */
         let result = await cartModel.updateOne(
-            { _id: idCart },
-            { $set: { "products.products.$[elem].qty": quantity } },
-            { arrayFilters: [{ "elem.products": idProduct }] }
+            { _id: idCart, "products.products": idProduct },
+            { $set: { "products.$.qty": quantity } }
         )
-
 
         res.json({ status: "success", payload: result })
 
@@ -125,6 +128,5 @@ router.get("/carts/:idCart", async (req, res) => {
         return res.status(400).send({ status: "error", error: error })
     }
 })
-
 
 module.exports = router;
