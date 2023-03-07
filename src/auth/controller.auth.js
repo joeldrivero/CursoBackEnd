@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
                 age: user.age,
                 role: "user"
             }
-           
+
         }
 
         res.json({ message: "Sesion iniciada" })
