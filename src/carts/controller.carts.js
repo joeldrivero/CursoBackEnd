@@ -3,6 +3,7 @@ const cart = new Cart("./src/cart.json")
 const cartModel = require("../models/carts.model")
 const { engine } = require("express-handlebars")
 const { Router } = require("express")
+const { privateAccess } = require("../middlewares")
 
 const router = Router();
 
@@ -117,7 +118,7 @@ router.get("/:idCart", async (req, res) => {
     }
 })
 
-router.get("/carts/:idCart", async (req, res) => {
+router.get("/carts/:idCart", privateAccess, async (req, res) => {
     try {
         let idCart = req.params.idCart;
         const cart = await cartModel.findOne({ _id: idCart }).populate('products.products')

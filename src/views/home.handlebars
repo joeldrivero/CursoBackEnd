@@ -1,4 +1,14 @@
 <div>
+  <form action="" id="signupForm">
+    <label for="">Nombre</label>
+    <p>{{user.first_name}}</p>
+    <label for="">Apellido</label>
+    <p>{{user.last_name}}</p>
+    <label for="">Rol</label>
+    <p>{{user.role}}</p>
+
+    <a href="http://localhost:8080/api/auth/logout">Cerrar sesion</a>
+</form>
   <h2>Lista de productos</h2>
   {{#if allProductos.docs}}
   <table class="table table-sm table-hover">

@@ -4,6 +4,7 @@ const productos = new ProductManager("./src/products.json")
 const { io } = require("socket.io-client")
 const { Router } = require("express")
 const productModel = require("../models/products.model")
+const { privateAccess } = require("../middlewares")
 const router = Router();
 const socket = io();
 
@@ -120,7 +121,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/products", async (req, res) => {
+router.get("/products", privateAccess, async (req, res) => {
     try {
         let lim = 10;
         let pag = 1;
@@ -154,7 +155,8 @@ router.get("/products", async (req, res) => {
         }
 
         var allProductos = JSON.parse(JSON.stringify(product))
-        res.render("home.handlebars", { allProductos });
+        const { user } = req.session
+        res.render("home.handlebars", { allProductos, user });
     } catch (error) {
 
     }

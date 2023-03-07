@@ -1,10 +1,13 @@
 
+const MongoStore = require("connect-mongo");
 const express = require("express");
 const handlebars = require("express-handlebars");
+const session = require("express-session");
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const user = process.env.USER;
 const password = process.env.PASSWORD
+
 
 const app = express();
 
@@ -16,6 +19,15 @@ mongoose.connect(`mongodb+srv://${user}:${password}@backend.0hlxsge.mongodb.net/
     }
 })
 
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: `mongodb+srv://${user}:${password}@backend.0hlxsge.mongodb.net/coder-sessions?retryWrites=true&w=majority`,
+        mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+        ttl: 15,
+
+    }),
+    secret: "coso", resave: false, saveUninitialized: false
+}))
 
 app.use(express.urlencoded({ extended: true }))
 
