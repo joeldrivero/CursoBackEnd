@@ -4,9 +4,12 @@ const express = require("express");
 const handlebars = require("express-handlebars");
 const session = require("express-session");
 const mongoose = require("mongoose");
+const passport = require("passport");
+const initializePassport = require("./config/passport.config");
+
 const routes = require("./routes");
 const user = process.env.USER;
-const secretKey= process.env.SECRET
+const secretKey = process.env.SECRET
 const password = process.env.PASSWORD
 
 
@@ -27,8 +30,11 @@ app.use(session({
         ttl: 15,
 
     }),
-    secret:password , resave: false, saveUninitialized: false
+    secret: password, resave: false, saveUninitialized: false
 }))
+initializePassport()
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.urlencoded({ extended: true }))
 
