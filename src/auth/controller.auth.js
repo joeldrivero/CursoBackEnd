@@ -34,14 +34,6 @@ router.post("/", passport.authenticate("login", { failureRedirect: "/failLogin" 
 
 router.get("/github", passport.authenticate("github", { scope: ["user:email"] }), async (req, res) => {
 
-/*     req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        email: req.user.email,
-        age: req.user.age,
-        role: role
-    } */
-
 })
 
 

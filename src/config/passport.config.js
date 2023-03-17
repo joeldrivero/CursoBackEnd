@@ -1,6 +1,7 @@
 const passport = require("passport");
 const local = require("passport-local");
 const GithubStrategy = require("passport-github2")
+const uuid = require('uuid');
 
 const User = require("../models/users.model");
 const { createHash, isValidPassword } = require("../utils/cryptPassword");
@@ -28,11 +29,12 @@ const initializePassport = () => {
         try {
             if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
                 let user = {
+                    _id: uuid.v4(),
                     first_name: "Admin",
                     last_name: "Admin",
-                    id: "",
                     email: "adminCoder@coder.com",
-                    role: "admin"
+                    role: "admin",
+                    isAdmin: true
                 }
                 return done(null, user)
             }
@@ -58,17 +60,20 @@ const initializePassport = () => {
             console.log(profile)
             const user = await User.findOne({ email: profile._json.email })
             if (!user) {
-                const newUserInfo = { first_name: profile._json.name, last_name: "", age: 18, email: profile._json.email, password: "" }
+                const newUserInfo = { first_name: profile._json.name, last_name: "", age: 18, email: profile._json.email, password: "",_id:"" }
                 const newUser = await User.create(newUserInfo)
                 return done(null, newUser)
+            }else{
+                return done(null, user)
             }
+        
         } catch (error) {
             return done(error)
         }
     }))
 
     passport.serializeUser((user, done) => {
-        done(null, user.id)
+        done(null, user)
     })
 
     passport.deserializeUser(async (id, done) => {
