@@ -18,7 +18,4 @@ router.get("/login", publicAccess, (req, res) => {
 })
 
 
-
-
-
 module.exports = router

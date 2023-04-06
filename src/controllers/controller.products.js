@@ -1,12 +1,8 @@
-
-const ProductManager = require("../ProductManager")
-const productos = new ProductManager("./src/products.json")
-const { io } = require("socket.io-client")
 const { Router } = require("express")
 const productModel = require("../models/products.model")
 const { privateAccess } = require("../middlewares")
 const router = Router();
-const socket = io();
+
 
 router.get("/", async (req, res) => {
     try {
@@ -175,6 +171,7 @@ router.get("/:idProduct", async (req, res) => {
 router.post("/", async (req, res) => {
 
     let { title, description, code, price, status, stock, category, thumbnails } = req.body
+    const newProduct = { title, description, code, price, status, stock, category, thumbnails }
 
     try {
         if (!title || !description || !price || !code || !stock || !category)
@@ -250,7 +247,7 @@ router.put("/:idProduct", async (req, res) => {
     catch (error) { return res.status(400).send({ status: "error", error: error }) }
 });
 
-router.delete("/:idProduct", async (req, res) => {
+/* router.delete("/:idProduct", async (req, res) => {
     try {
         let idProduct = req.params.idProduct;
         const product = await productModel.findOneAndDelete({ _id: idProduct })
@@ -260,8 +257,6 @@ router.delete("/:idProduct", async (req, res) => {
     }
 
 });
-
-
 
 async function updateProduct(req, res) {
     try {
@@ -273,5 +268,5 @@ async function updateProduct(req, res) {
         return res.status(400).send({ status: "error", error: error })
     }
 }
-
+ */
 module.exports = router;

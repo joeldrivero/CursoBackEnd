@@ -6,17 +6,14 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const initializePassport = require("./config/passport.config");
-
 const routes = require("./routes");
-const user = process.env.USER;
-const secretKey = process.env.SECRET
-const password = process.env.PASSWORD
+const { user, password, host } = require("./config/app.config");
 
 
 const app = express();
 
 app.use(express.json())
-mongoose.connect(`mongodb+srv://${user}:${password}@backend.0hlxsge.mongodb.net/?retryWrites=true&w=majority`, error => {
+mongoose.connect(`mongodb+srv://${user}:${password}@${host}/?retryWrites=true&w=majority`, error => {
     if (error) {
         console.log("No se pudo conectar")
         process.exit()

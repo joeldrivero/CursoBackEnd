@@ -1,8 +1,8 @@
-const products = require("../products/controller.products")
-const carts = require("../carts/controller.carts")
-const views = require("../viewsTemplate/controller.viewsTemplate")
-const users = require("../users/controller.users")
-const auth = require("../auth/controller.auth")
+const products = require("../controllers/controller.products")
+const carts = require("../controllers/controller.carts")
+const views = require("../controllers/controller.viewsTemplate")
+const users = require("../controllers/controller.users")
+const auth = require("../controllers/controller.auth")
 
 const routes = (app) => {
     app.use("/", views)

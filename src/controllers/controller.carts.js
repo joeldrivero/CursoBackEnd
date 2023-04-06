@@ -1,7 +1,4 @@
-const Cart = require("../CartManager")
-const cart = new Cart("./src/cart.json")
 const cartModel = require("../models/carts.model")
-const { engine } = require("express-handlebars")
 const { Router } = require("express")
 const { privateAccess } = require("../middlewares")
 
