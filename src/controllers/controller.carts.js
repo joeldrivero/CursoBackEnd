@@ -4,6 +4,8 @@ const { privateAccess } = require("../middlewares")
 const CartsDAO = require("../dao/mongo/Carts.mongo");
 const authUserMiddleware = require("../middlewares/authUser");
 const productModel = require("../models/products.model")
+const ticketModel = require("../models/ticket.model")
+const { v4: uuidv4 } = require('uuid');
 
 const router = Router();
 
@@ -11,7 +13,7 @@ const router = Router();
 router.post("/:cid/purchase", async (req, res) => {
     try {
         const cart = await cartModel.findById(req.params.cid).populate("products.products")
-
+        let amount = 0
         for (const item of cart.products) {
             const product = item.products
             const qty = item.qty
@@ -23,8 +25,16 @@ router.post("/:cid/purchase", async (req, res) => {
                 await productModel.findByIdAndUpdate(product._id, { $inc: { stock: -qty } })
             }
         }
-
-        await cart.save()
+        for (const product of cart.products) {
+            amount += product.products.price * product.qty
+        }
+        const ticket = new ticketModel({
+            code: uuidv4(),
+            purchase_datatime: new Date().toISOString(),
+            amount: amount,
+            purchaser: "req.session.user.email"
+        })
+        const result = await ticketModel.create(ticket);
         res.status(200).json({ message: "Compra realizada con éxito" })
     } catch (error) {
         console.log(error)

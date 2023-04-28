@@ -3,6 +3,7 @@ const passport = require("passport");
 const User = require("../models/users.model");
 const { createHash } = require("../utils/cryptPassword");
 
+
 const router = Router()
 
 router.post("/", passport.authenticate("register", { failureRedirect: "/failRegister" }), async (req, res) => {
