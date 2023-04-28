@@ -3,8 +3,34 @@ const { Router } = require("express")
 const { privateAccess } = require("../middlewares")
 const CartsDAO = require("../dao/mongo/Carts.mongo");
 const authUserMiddleware = require("../middlewares/authUser");
+const productModel = require("../models/products.model")
 
 const router = Router();
+
+
+router.post("/:cid/purchase", async (req, res) => {
+    try {
+        const cart = await cartModel.findById(req.params.cid).populate("products.products")
+
+        for (const item of cart.products) {
+            const product = item.products
+            const qty = item.qty
+
+            const tieneStock = await productModel.findById(product._id).select("stock")
+            if (tieneStock.stock < qty) {
+                cart.products = cart.products.filter((p) => p.products._id !== product._id)
+            } else {
+                await productModel.findByIdAndUpdate(product._id, { $inc: { stock: -qty } })
+            }
+        }
+
+        await cart.save()
+        res.status(200).json({ message: "Compra realizada con éxito" })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "Error al procesar la compra" })
+    }
+})
 
 router.post("/", async (req, res) => {
     try {
@@ -16,7 +42,7 @@ router.post("/", async (req, res) => {
     }
 })
 
-router.post("/:idCart/product/:idProduct", authUserMiddleware, async (req, res) => {
+router.post("/:idCart/product/:idProduct", /* authUserMiddleware,  */async (req, res) => {
 
     try {
         const result = await CartsDAO.addToCart(req.params.idCart, req.params.idProduct);

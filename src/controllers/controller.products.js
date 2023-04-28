@@ -1,7 +1,6 @@
 const { Router } = require("express")
 const productModel = require("../models/products.model")
 const { privateAccess } = require("../middlewares");
-const productService = require("../dao/factory");
 const authMiddleware = require("../middlewares/auth");
 const ProductDTO = require("../dao/DTOs/product.dto");
 const productService = require("../repositoires/index");

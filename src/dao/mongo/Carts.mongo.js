@@ -14,7 +14,7 @@ class CartMongoDAO {
 
     async addToCart(idCart, idProduct) {
         try {
-            const exists = await cartModel.find({ products: { $elemMatch: { products: idProduct } } }).toArray();
+            const exists = await cartModel.find({ products: { $elemMatch: { products: idProduct } } });
 
             if (exists.length !== 0) {
                 const result = await cartModel.updateOne(
