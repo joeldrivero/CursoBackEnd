@@ -33,7 +33,7 @@ function addCart(value) {
     },
   }).then((res) => res.json())
     .then((res) => {
-      alert("Producto agregado correctamente")
+      alert(res)
     }).catch((error) => console.error(error))
 }
 

@@ -3,6 +3,7 @@ const carts = require("../controllers/controller.carts")
 const views = require("../controllers/controller.viewsTemplate")
 const users = require("../controllers/controller.users")
 const auth = require("../controllers/controller.auth")
+const mail = require("../controllers/controller.mail")
 
 const routes = (app) => {
     app.use("/", views)
@@ -12,6 +13,7 @@ const routes = (app) => {
     app.use("/api/auth", auth)
     app.use("/", products)
     app.use("/", carts)
+    app.use("/mail", mail)
 }
 
 module.exports = routes
