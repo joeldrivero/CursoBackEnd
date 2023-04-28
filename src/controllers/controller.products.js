@@ -1,16 +1,15 @@
 const { Router } = require("express")
 const productModel = require("../models/products.model")
 const { privateAccess } = require("../middlewares");
-const ProductsDao = require("../dao/factory");
+const productService = require("../dao/factory");
 const authMiddleware = require("../middlewares/auth");
 const ProductDTO = require("../dao/DTOs/product.dto");
-const {productService} = require("../repositoires/index");
+const productService = require("../repositoires/index");
 const router = Router();
 
 
 router.get("/", async (req, res) => {
     try {
-
         const productList = await productService.getAll(req.query);
         res.json({ result: "success", payload: productList });
     } catch (error) {
@@ -83,7 +82,7 @@ router.post("/", authMiddleware, async (req, res) => {
         if (exist) {
             return res.send({ status: "error", error: "El codigo del producto ya existe" })
         }
-        const result = await ProductsDao.createProduct(newProduct);
+        const result = await productService.createProduct(newProduct);
         res.send({ status: "success", payload: result })
     }
 
@@ -136,7 +135,7 @@ router.put("/:idProduct", authMiddleware, async (req, res) => {
             updateProduct.status = status;
         }
 
-        let result = await ProductsDao.updateProduct(idProduct, updateProduct);
+        let result = await productService.updateProduct(idProduct, updateProduct);
         res.send({ status: "success", payload: result })
     }
     catch (error) {
@@ -147,7 +146,7 @@ router.put("/:idProduct", authMiddleware, async (req, res) => {
 router.delete("/:idProduct", authMiddleware, async (req, res) => {
     try {
         let idProduct = req.params.idProduct;
-        const product = await ProductsDao.deleteProduct({ idProduct })
+        const product = await productService.deleteProduct({ idProduct })
         res.json({ result: "success", payload: product })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })

@@ -1,7 +1,9 @@
 const productModel = require("../../models/products.model")
 
-class ProductsMongoDao {
-    constructor() { }
+class Products {
+    constructor() { 
+
+    }
 
     async getAll(limit = 10, page = 1, category, sort) {
         let filter = {};
@@ -68,7 +70,6 @@ class ProductsMongoDao {
 
 }
 
-
 function buildNextLink(category, sort, limit, page) {
     let nextLink = `http://localhost:8080/api/products?`;
     if (category) {
@@ -93,4 +94,4 @@ function buildPrevLink(category, sort, limit, page) {
     return prevLink;
 }
 
-module.exports = new ProductsMongoDao()
+module.exports = new Products()

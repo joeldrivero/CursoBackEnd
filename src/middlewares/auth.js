@@ -7,7 +7,7 @@ function authMiddleware(req, res, next) {
             res.status(403).send({ status: "error", message: "Acceso denegado" });
         }
     } catch (error) {
-        res.status(500).send({ status: "error", error: error });
+        res.status(500).send({ status: "error", error: "Acceso Denegado" });
     }
 }
 

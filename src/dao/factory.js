@@ -10,6 +10,6 @@ switch (persistence) {
                 process.exit()
             }
         })
-        module.exports = require("../dao/mongo/Products.mongo")
+        module.exports = require("../dao/mongo/Products.mongo");
         break
 }

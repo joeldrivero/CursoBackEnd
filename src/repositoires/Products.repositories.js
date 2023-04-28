@@ -5,36 +5,13 @@ class ProductRepository {
         this.dao = dao
     }
     async getAll(limit = 10, page = 1, category, sort) {
-        let filter = {};
-        if (category) {
-            filter.category = category.toString();
-        }
-        let options = { limit: limit, page: page };
-        if (sort) {
-            options.sort = { price: sort.toString() };
-        }
-        const products = await this.dao.find();
-        if (products.hasNextPage) {
-            products.nextLink = buildNextLink(category, sort, limit, products.nextPage);
-            if (products.hasPrevPage) {
-                products.prevLink = buildPrevLink(category, sort, limit, products.prevPage);
-            } else {
-                products.prevLink = null;
-            }
-        } else {
-            products.nextLink = null;
-            if (products.hasPrevPage) {
-                products.prevLink = buildPrevLink(category, sort, limit, products.prevPage);
-            } else {
-                products.prevLink = null;
-            }
-        }
-        return products;
+        const result = await this.dao.getAll(limit = 10, page = 1, category, sort);   
+        return result;
     }
 
     async createProduct(product) {
         try {
-            const result = await this.dao.create(product);
+            const result = await this.dao.createProduct(product);
             return result;
         } catch (error) {
             throw error;
@@ -43,7 +20,7 @@ class ProductRepository {
 
     async updateProduct(id, updateData) {
         try {
-            const result = await this.dao.updateOne({ _id: id }, updateData);
+            const result = await this.dao.updateProduct({ _id: id }, updateData);
             return result;
         } catch (error) {
             throw new Error(`Error al actualizar el producto: ${error}`);
@@ -52,7 +29,7 @@ class ProductRepository {
 
     async getProductById(idProduct) {
         try {
-            const product = await this.dao.findOne({ _id: idProduct });
+            const product = await this.dao.getProductById({ _id: idProduct });
             return product;
         } catch (error) {
             throw new Error(`Error al obtener el producto: ${error}`);
@@ -60,7 +37,7 @@ class ProductRepository {
     }
     async deleteProduct(idProduct) {
         try {
-            const product = await this.dao.findOneAndDelete({ _id: idProduct });
+            const product = await this.dao.deleteProduct({ _id: idProduct });
             return product;
         } catch (error) {
             throw new Error(error);
