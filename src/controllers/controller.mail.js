@@ -1,10 +1,13 @@
 const { Router } = require("express")
 const router = Router();
 const transport = require("../utils/gmail.util")
+const {
+    serviceMail, serviceMailPort, gmailUser, gmailPassword
+} = require("../config/gmail.config")
 
 router.get("/", async (req, res) => {
     try {
-        const [to, subject, message] = req.body
+        const {to, subject, message} = req.body
         const mailOptions = {
             from: gmailUser,
             to,

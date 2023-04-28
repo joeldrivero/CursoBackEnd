@@ -6,6 +6,7 @@ const auth = require("../controllers/controller.auth")
 const mail = require("../controllers/controller.mail")
 
 const routes = (app) => {
+    app.use("/mail", mail)
     app.use("/", views)
     app.use("/api/products", products)
     app.use("/api/carts", carts)
@@ -13,7 +14,6 @@ const routes = (app) => {
     app.use("/api/auth", auth)
     app.use("/", products)
     app.use("/", carts)
-    app.use("/mail", mail)
 }
 
 module.exports = routes

@@ -1,15 +1,17 @@
 const { Router } = require("express")
 const productModel = require("../models/products.model")
 const { privateAccess } = require("../middlewares");
-const ProductsDao = require("../dao/mongo/Products.mongo");
+const ProductsDao = require("../dao/factory");
 const authMiddleware = require("../middlewares/auth");
+const ProductDTO = require("../dao/DTOs/product.dto");
+const {productService} = require("../repositoires/index");
 const router = Router();
 
 
 router.get("/", async (req, res) => {
     try {
 
-        const productList = await ProductsDao.getAll(req.query);
+        const productList = await productService.getAll(req.query);
         res.json({ result: "success", payload: productList });
     } catch (error) {
 
@@ -70,7 +72,7 @@ router.get("/:idProduct", async (req, res) => {
 router.post("/", authMiddleware, async (req, res) => {
 
     let { title, description, code, price, status, stock, category, thumbnails } = req.body
-    const newProduct = { title, description, code, price, status, stock, category, thumbnails }
+    const newProduct = new ProductDTO({ title, description, code, price, status, stock, category, thumbnails })
 
     try {
         if (!title || !description || !price || !code || !stock || !category)

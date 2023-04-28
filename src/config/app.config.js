@@ -9,4 +9,5 @@ module.exports = {
     password: process.env.PASSWORD,
     CLIENT_ID: process.env.CLIENT_ID,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
+    persistence: process.env.PERSISTENCE
 }
