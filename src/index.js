@@ -5,9 +5,15 @@ const handlebars = require("express-handlebars");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const swaggerJsDoc = require("swagger-jsdoc");
+/* const  __dirname  = require("./utils/index.js") */
+const swaggerUiExpress = require("swagger-ui-express");
 const initializePassport = require("./config/passport.config");
 const routes = require("./routes");
 const { user, password, host } = require("./config/app.config");
+const addlogger = require("./utils/logger");
+const swaggerJSDoc = require("swagger-jsdoc");
+
 
 
 const app = express();
@@ -20,6 +26,19 @@ mongoose.connect(`mongodb+srv://${user}:${password}@${host}/?retryWrites=true&w=
     }
 })
 
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.1",
+        info: {
+            title: "Documentacion de API"
+        }
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`]
+}
+
+const specs = swaggerJsDoc(swaggerOptions);
+
+app.use("/apidocs", swaggerUiExpress.serve,swaggerUiExpress.setup(specs))
 app.use(session({
     store: MongoStore.create({
         mongoUrl: `mongodb+srv://${user}:${password}@backend.0hlxsge.mongodb.net/coder-sessions?retryWrites=true&w=majority`,
@@ -32,7 +51,7 @@ app.use(session({
 initializePassport()
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(addlogger)
 app.use(express.urlencoded({ extended: true }))
 
 app.engine("handlebars", handlebars.engine())

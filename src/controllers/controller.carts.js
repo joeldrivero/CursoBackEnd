@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
     try {
         let products = []
         let result = await CartsDAO.createCart({ products });
-        res.json({ status: "success", payload: result })
+        res.json({ status: "Carrito creado", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -56,7 +56,7 @@ router.post("/:idCart/product/:idProduct", /* authUserMiddleware,  */async (req,
 
     try {
         const result = await CartsDAO.addToCart(req.params.idCart, req.params.idProduct);
-        res.json({ status: "success", payload: result })
+        res.json({ status: "Producto agregado", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -70,7 +70,7 @@ router.put("/:idCart", async (req, res) => {
 
         let result = await CartsDAO.updateCart({ _id: idCart }, { $push: { products: { $each: array } } })
 
-        res.json({ status: "success", payload: result })
+        res.json({ status: "Carrito obtenido exitosamente", payload: result })
 
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
@@ -82,7 +82,7 @@ router.put("/:idCart/product/:idProduct", async (req, res) => {
 
     try {
         const result = await CartsDAO.updateProduct(req.params.idCart, req.params.idProduct, req.body.quantity);
-        res.json({ status: "success", payload: result })
+        res.json({ status: "carrito actualizado", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -91,7 +91,7 @@ router.put("/:idCart/product/:idProduct", async (req, res) => {
 router.delete("/:idCart/product/:idProduct", authUserMiddleware, async (req, res) => {
     try {
         let result = await CartsDAO.deleteProduct(req.params.idCart, req.params.idProduct)
-        res.json({ status: "success", payload: result })
+        res.json({ status: "Carrito eliminado", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -100,7 +100,7 @@ router.delete("/:idCart/product/:idProduct", authUserMiddleware, async (req, res
 router.delete("/:idCart", async (req, res) => {
     try {
         const result = await CartsDAO.deleteCart(idCart)
-        res.json({ status: "success", payload: result })
+        res.json({ status: "Carrito eliminado", payload: result })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }

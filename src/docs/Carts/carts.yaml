@@ -1,0 +1,173 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: Cart API
+paths:
+  api/carts:
+    post:
+      summary: Crear un nuevo carrito
+      responses:
+        200:
+          description: Carrito creado
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              error:
+                type: string
+
+  api/carts/{idCart}:
+    get:
+      summary: Obtener un carrito por ID
+      parameters:
+        - in: path
+          name: idCart
+          description: ID del carrito
+          required: true
+          type: string
+      responses:
+        200:
+          description: Carrito obtenido exitosamente
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+    put:
+      summary: Actualizar un carrito por ID
+      parameters:
+        - in: path
+          name: idCart
+          description: ID del carrito
+          required: true
+          type: string
+        - in: body
+          name: products
+          description: Array de productos
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/CartProduct"
+      responses:
+        200:
+          description: carrito actualizado
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              error:
+                type: string
+    delete:
+      summary: Eliminar un carrito por id
+      parameters:
+        - in: path
+          name: idCart
+          description: ID del carrito
+          required: true
+          type: string
+      responses:
+        200:
+          description: Carrito eliminado
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+
+  api/carts/{idCart}/product/{idProduct}:
+    post:
+      summary: Agregar un producto a un carrito específico
+      parameters:
+        - in: path
+          name: idCart
+          description: ID del carrito
+          required: true
+          type: string
+        - in: path
+          name: idProduct
+          description: ID del producto
+          required: true
+          type: string
+      responses:
+        200:
+          description: Producto agregado
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+        400:
+          description: Bad request
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              error:
+                type: string
+    delete:
+      summary: Eliminar un producto de un carrito específico
+      parameters:
+        - in: path
+          name: idCart
+          description: ID del carrito
+          required: true
+          type: string
+        - in: path
+          name: idProduct
+          description: ID del producto
+          required: true
+          type: string
+    responses:
+        200:
+          description: Carrito eliminado
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              payload:
+                $ref: "#/definitions/Cart"
+
+definitions:
+  Cart:
+    type: object
+    properties:
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/CartProduct"
+  CartProduct:
+    type: object
+    properties:
+      qty:
+        type: number
+      products:
+        type: string

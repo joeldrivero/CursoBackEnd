@@ -10,7 +10,7 @@ const router = Router();
 router.get("/", async (req, res) => {
     try {
         const productList = await productService.getAll(req.query);
-        res.json({ result: "success", payload: productList });
+        res.json({ result: "Productos obtenidos exitosamente", payload: productList });
     } catch (error) {
 
     }
@@ -61,7 +61,7 @@ router.get("/:idProduct", async (req, res) => {
     try {
         let idProduct = req.params.idProduct;
         const product = await productModel.findOne({ _id: idProduct })
-        res.json({ result: "success", payload: product })
+        res.json({ result: "Producto obtenido exitosamente", payload: product })
     } catch (error) {
         return res.status(400).send({ status: "error", error: error })
     }
@@ -82,7 +82,7 @@ router.post("/", authMiddleware, async (req, res) => {
             return res.send({ status: "error", error: "El codigo del producto ya existe" })
         }
         const result = await productService.createProduct(newProduct);
-        res.send({ status: "success", payload: result })
+        res.send({ status: "Producto creado exitosamente", payload: result })
     }
 
     catch {
@@ -135,7 +135,7 @@ router.put("/:idProduct", authMiddleware, async (req, res) => {
         }
 
         let result = await productService.updateProduct(idProduct, updateProduct);
-        res.send({ status: "success", payload: result })
+        res.send({ status: "Producto actualizado", payload: result })
     }
     catch (error) {
         return res.status(400).send({ status: "error", error: error.message })
@@ -153,15 +153,6 @@ router.delete("/:idProduct", authMiddleware, async (req, res) => {
 
 });
 
-async function updateProduct(req, res) {
-    try {
-        let product = req.body;
-        let idProduct = req.params.idProduct;
-        const updateProducto = await productos.updateProduct(product, idProduct);
-        res.status(200).send({ status: "Producto actualizado correctamente", mesagge: "Producto actualizado correctamente" })
-    } catch (error) {
-        return res.status(400).send({ status: "error", error: error })
-    }
-}
+
 
 module.exports = router;
